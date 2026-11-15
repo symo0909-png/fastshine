@@ -188,6 +188,8 @@ footer{padding:40px 0 110px;color:var(--muted);font-size:.88rem}
 .cl img,.cl .any{width:46px;height:46px;border-radius:50%;object-fit:cover}
 .cl .any{background:var(--teal-l);display:grid;place-items:center;color:var(--teal);font-size:1.3rem}
 .cl:hover{border-color:var(--teal)}
+.cl[disabled]{opacity:.45;pointer-events:none;filter:grayscale(1)}
+.cl .bk{font-size:.68rem;color:#C0392B;margin-top:-4px}
 .cl.sel{border-color:var(--teal);background:var(--teal-l);box-shadow:inset 0 0 0 1px var(--teal)}
 .cl.sel img{box-shadow:0 0 0 2px var(--teal)}
 @media (max-width:980px){.team{grid-template-columns:repeat(3,1fr)}}
@@ -518,11 +520,19 @@ $("#rateCards").innerHTML = AREAS.map((a,i)=>`<div class="rate ${i===0?"hl":""}"
 const ex = CONFIG.rates[AREAS[0]]+CONFIG.materialsFee;
 $("#example").innerHTML = `Example: 2 cleaners × 4 hours in ${AREAS[0]} with materials = <b>AED ${2*4*ex}</b>`;
 $("#teamGrid").innerHTML = CONFIG.cleaners.map(c=>`<a class="member" href="#book" data-cleaner="${c.name}"><img src="${c.photo}" alt="${c.name}, Fast Shine cleaner" loading="lazy"><b>${c.name}</b><small>Book ${c.name} →</small></a>`).join("");
+// is this named cleaner already booked during the chosen date/time (with travel buffer)?
+function cleanerBusy(name){
+  if(!st.date || st.time===null) return false;
+  const n=name.toLowerCase(), b=CONFIG.travelBuffer, s0=st.time, s1=st.time+st.hours;
+  return BOOKED.some(x=>x.date===st.date && x.names && x.names.includes(n) && s0 < x.end+b && x.start-b < s1);
+}
 function renderCleaners(){
+  st.cleaners = st.cleaners.filter(n=>!cleanerBusy(n));
   if(st.cleaners.length>st.ladies) st.cleaners=st.cleaners.slice(-st.ladies);
   $("#clHint").textContent = st.ladies>1 ? `(optional, pick up to ${st.ladies})` : "(optional)";
   const any=`<button type="button" class="cl ${st.cleaners.length?"":"sel"}" data-c=""><span class="any">✦</span>Anyone</button>`;
-  $("#cleanerOpts").innerHTML = any + CONFIG.cleaners.map(c=>`<button type="button" class="cl ${st.cleaners.includes(c.name)?"sel":""}" data-c="${c.name}"><img src="${c.photo}" alt="">${c.name}</button>`).join("");
+  $("#cleanerOpts").innerHTML = any + CONFIG.cleaners.map(c=>{ const busy=cleanerBusy(c.name);
+    return `<button type="button" class="cl ${st.cleaners.includes(c.name)?"sel":""}" data-c="${c.name}" ${busy?"disabled":""}><img src="${c.photo}" alt="">${c.name}${busy?'<small class="bk">Booked</small>':""}</button>`; }).join("");
 }
 function pickCleaner(n){
   if(!n){ st.cleaners=[]; }
@@ -604,14 +614,18 @@ async function loadBookings(){
     const url=`https://docs.google.com/spreadsheets/d/${CONFIG.sheetId}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(CONFIG.sheetTab)}&_=${Date.now()}`;
     const txt=await (await fetch(url)).text();
     const json=JSON.parse(txt.slice(txt.indexOf("{"), txt.lastIndexOf("}")+1));
+    const nameCol = (json.table.cols||[]).findIndex(col=>/name/i.test(col.label||""));
+    const known = CONFIG.cleaners.map(c=>c.name.toLowerCase());
     BOOKED = (json.table.rows||[]).map(r=>{
       const c=r.c||[], date=cellDate(c[0]), start=cellHour(c[1]);
-      const hours=cellNum(c[2], CONFIG.closeHour-(start??CONFIG.openHour)), cleaners=cellNum(c[3], CONFIG.totalCleaners);
       if(!date) return null;
+      const names = nameCol>=0 && c[nameCol] && c[nameCol].v ? String(c[nameCol].v).split(/[,&\/+]|\band\b/i).map(x=>x.trim().toLowerCase()).filter(x=>known.includes(x)) : [];
+      const hours=cellNum(c[2], CONFIG.closeHour-(start??CONFIG.openHour)), cleaners=cellNum(c[3], names.length || CONFIG.totalCleaners);
       const st0 = start ?? CONFIG.openHour;
-      return {date, start:st0, end:st0+hours, cleaners};
+      return {date, start:st0, end:st0+hours, cleaners, names};
     }).filter(Boolean);
     if(st.step===2){ renderDates(); renderTimes(); }
+    if(st.step===3) renderCleaners();
   }catch(e){ console.warn("Availability sheet not loaded; showing all slots.", e); }
 }
 // cleaners already busy during hour-cell [t, t+1) on a date (travel buffer applied around existing jobs)
@@ -674,6 +688,7 @@ function goStep(n){
   $("#bookFoot").style.display = n<4 ? "" : "none";
   if(n<4) $("#nextBtn").textContent=NEXT[n];
   if(n===2){ renderDates(); renderTimes(); }
+  if(n===3) renderCleaners();
   if(n===4) buildSummary();
 }
 function validPhone(v){ const d=v.replace(/\D/g,""); return /^(05\d{8}|5\d{8}|9715\d{8}|009715\d{8})$/.test(d); }
