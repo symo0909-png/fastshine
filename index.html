@@ -27,6 +27,7 @@ header{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.92);backdro
 .nav-links{display:flex;gap:26px;align-items:center;font-weight:600;font-size:.94rem}
 .nav-links a{text-decoration:none;color:var(--muted)}
 .nav-links a:hover{color:var(--teal)}
+.nav-links a.btn,.nav-links a.btn:hover{color:#fff}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 22px;border-radius:999px;font-weight:700;text-decoration:none;transition:transform .15s, box-shadow .15s, background .15s}
 .btn-primary{background:var(--teal);color:#fff;box-shadow:0 6px 18px rgba(14,140,140,.28)}
 .btn-primary:hover{background:var(--teal-d);transform:translateY(-1px)}
@@ -174,6 +175,15 @@ details p{color:var(--muted);padding-bottom:18px;font-size:.95rem}
 footer{padding:40px 0 110px;color:var(--muted);font-size:.88rem}
 .foot{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:28px}
 
+/* team */
+.team{display:grid;grid-template-columns:.85fr 1fr;gap:56px;align-items:center}
+.team img{width:100%;max-height:560px;object-fit:cover;object-position:center 30%;border-radius:24px;box-shadow:0 24px 60px rgba(8,96,95,.18)}
+.names{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.names span{background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-weight:700;font-size:.88rem;color:var(--teal-d)}
+.cleaners{display:flex;flex-wrap:wrap;gap:8px}
+.cleaners .opt{padding:9px 14px;border-radius:999px;font-weight:700;font-size:.88rem}
+@media (max-width:980px){.team{grid-template-columns:1fr;gap:30px}.team img{max-height:440px}}
+
 /* floating */
 .wa-float{position:fixed;right:20px;bottom:22px;z-index:50;width:58px;height:58px;border-radius:50%;background:var(--wa);display:grid;place-items:center;box-shadow:0 10px 26px rgba(31,168,85,.4);text-decoration:none}
 .mbar{display:none}
@@ -316,6 +326,9 @@ footer{padding:40px 0 110px;color:var(--muted);font-size:.88rem}
             <div class="field" id="f-phone"><label class="lbl">Mobile number</label><input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="05X XXX XXXX"><div class="err">Enter a valid UAE mobile.</div></div>
           </div>
           <div class="field" id="f-addr"><label class="lbl">Address in <span id="areaLbl" style="color:var(--teal-d);font-weight:800"></span></label><input id="addr" autocomplete="street-address" placeholder="Area, building / villa & flat no."><div class="err">Please add your address.</div></div>
+          <div class="field"><label class="lbl">Preferred cleaner <span>(optional)</span></label>
+            <div class="cleaners" id="cleanerOpts"></div>
+          </div>
           <div class="field"><label class="lbl">Anything we should know? <span>(optional)</span></label><textarea id="notes" placeholder="Pets, focus areas, parking, access code…"></textarea></div>
         </div>
 
@@ -359,6 +372,20 @@ footer{padding:40px 0 110px;color:var(--muted);font-size:.88rem}
       <div><span class="num">1</span><h3>Build your clean</h3><p>Choose the service, number of cleaners and hours. Your price updates live, so there are no surprises.</p></div>
       <div><span class="num">2</span><h3>Pick a slot</h3><p>Choose any day in the next two weeks and a start time that suits you, mornings to early evening.</p></div>
       <div><span class="num">3</span><h3>Confirm on WhatsApp</h3><p>Your booking goes straight to our team on WhatsApp. We confirm your slot and cleaner(s) quickly.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section style="padding-top:0">
+  <div class="wrap team">
+    <img src="team.jpg" alt="The Fast Shine cleaning team in their pink uniforms" loading="lazy">
+    <div>
+      <span class="eyebrow">Meet the team</span>
+      <h2 class="t">The ladies behind the shine.</h2>
+      <p class="sub">Friendly, experienced and proud of their work. Found a favourite? Ask for her by name when you book, and we'll send her whenever she's free.</p>
+      <div class="names" id="teamNames"></div>
+      <a class="btn btn-primary" href="#book" style="margin-top:22px">Book your cleaner</a>
     </div>
   </div>
 </section>
@@ -450,6 +477,7 @@ const CONFIG = {
   travelBuffer: 1,                     // hours kept free between jobs for travel
   sheetId: "1ipKreB-i88R0URS2jZnAi2JlKIHu1bil6KTMYXw7fUc",                         // Google Sheet ID with confirmed bookings (see README). Empty = all slots open
   sheetTab: "Bookings",
+  cleaners: ["Rose","Sherlyn","Judy","Charlotte","Angie","Anna"],   // shown in "Preferred cleaner"
   daysAhead: 14,
 };
 const SERVICES = [
@@ -461,7 +489,7 @@ const SERVICES = [
 /* ====================== */
 
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
-const st = {area:"Ajman", svc:"regular", ladies:1, hours:3, mat:0, freq:"One-time", date:null, time:null, step:1};
+const st = {cleaner:"No preference", area:"Ajman", svc:"regular", ladies:1, hours:3, mat:0, freq:"One-time", date:null, time:null, step:1};
 const DAYS=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"], MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 $("#yr").textContent = new Date().getFullYear();
@@ -477,6 +505,11 @@ $("#heroTags").innerHTML = AREAS.map(a=>`<a class="ptag" href="#book" data-area=
 $("#rateCards").innerHTML = AREAS.map((a,i)=>`<div class="rate ${i===0?"hl":""}">${i===0?'<span class="badge">Best rate</span>':""}<h3>${a}</h3><div class="big">AED ${CONFIG.rates[a]}<span> / hr / cleaner</span></div><ul><li>All services available</li><li>+AED ${CONFIG.materialsFee}/hr if we bring materials</li><li>Minimum ${CONFIG.minHours} hours</li></ul><a class="btn ${i===0?"btn-primary":"btn-ghost"}" href="#book" data-area="${a}">Book in ${a}</a></div>`).join("");
 const ex = CONFIG.rates[AREAS[0]]+CONFIG.materialsFee;
 $("#example").innerHTML = `Example: 2 cleaners × 4 hours in ${AREAS[0]} with materials = <b>AED ${2*4*ex}</b>`;
+$("#teamNames").innerHTML = CONFIG.cleaners.map(n=>`<span>${n}</span>`).join("");
+function renderCleaners(){
+  $("#cleanerOpts").innerHTML = ["No preference",...CONFIG.cleaners].map(n=>`<button type="button" class="opt ${n===st.cleaner?"sel":""}" data-c="${n}">${n}</button>`).join("");
+}
+$("#cleanerOpts").addEventListener("click",e=>{const b=e.target.closest(".opt"); if(!b)return; st.cleaner=b.dataset.c; renderCleaners();});
 function renderAreaOpts(){
   $("#areaOpts").innerHTML = AREAS.map(a=>`<button type="button" class="opt ${a===st.area?"sel":""}" data-a="${a}"><b>${a}</b><small>AED ${CONFIG.rates[a]}/hr</small></button>`).join("");
 }
@@ -649,6 +682,7 @@ function bookingText(){
     `Hours: ${st.hours}`,
     `Materials: ${st.mat?"Yes, bring materials":"No, I have my own"}`,
     `Frequency: ${st.freq}`,
+    `Preferred cleaner: ${st.cleaner}`,
     `Date: ${fmtDate(d)}`,
     `Start time: ${fmtTime(st.time)}`,
     "",
@@ -663,7 +697,7 @@ function bookingText(){
 }
 function buildSummary(){
   const d=dateOf(st.date);
-  const rows=[["Service",svcObj().name],["Team",`${st.ladies} cleaner${st.ladies>1?"s":""} · ${st.hours} hrs`],["Materials",st.mat?"We bring them":"Your own"],["When",`${fmtDate(d)} · ${fmtTime(st.time)}`],["Frequency",st.freq],["Where",`${$("#addr").value.trim()}, ${st.area}`],["Total",`AED ${total()}`]];
+  const rows=[["Service",svcObj().name],["Team",`${st.ladies} cleaner${st.ladies>1?"s":""} · ${st.hours} hrs`],["Materials",st.mat?"We bring them":"Your own"],["When",`${fmtDate(d)} · ${fmtTime(st.time)}`],["Frequency",st.freq],["Cleaner",st.cleaner],["Where",`${$("#addr").value.trim()}, ${st.area}`],["Total",`AED ${total()}`]];
   $("#summary").innerHTML=rows.map(r=>`<div><span>${r[0]}</span><span>${r[1].replace(/</g,"&lt;")}</span></div>`).join("");
   $("#waSend").href=`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(bookingText())}`;
 }
@@ -673,7 +707,7 @@ $("#copyBtn").addEventListener("click",async()=>{
   setTimeout(()=>$("#copyBtn").textContent="Copy details",1800);
 });
 
-renderAreaOpts(); renderSvcOpts(); update(); loadBookings();
+renderAreaOpts(); renderSvcOpts(); renderCleaners(); update(); loadBookings();
 </script>
 </body>
 </html>
