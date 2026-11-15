@@ -484,6 +484,8 @@ const CONFIG = {
   travelBuffer: 1,                     // hours kept free between jobs for travel
   sheetId: "1ipKreB-i88R0URS2jZnAi2JlKIHu1bil6KTMYXw7fUc",                         // Google Sheet ID with confirmed bookings (see README). Empty = all slots open
   sheetTab: "Bookings",
+  formId: "1FAIpQLSdGFX4HpCbaSxMWCXGKLw13obMU0UJIt2X5LaEIOV1XwC-fTA",  // Google Form that collects booking requests
+  formEntry: "entry.1672837537",
   cleaners: [                          // shown in "Meet the team" and "Preferred cleaner"
     {name:"Rose", photo:"cleaners/rose.jpg"},
     {name:"Sherlyn", photo:"cleaners/sherlyn.jpg"},
@@ -710,10 +712,27 @@ $("#nextBtn").addEventListener("click",()=>{
 $("#backBtn").addEventListener("click",()=>goStep(st.step-1));
 $("#editBtn").addEventListener("click",()=>goStep(1));
 
+let REF=null, SENT_FOR=null;
+function bookingData(){
+  return {ref:REF, service:svcObj().name, emirate:st.area, cleaners:st.ladies, hours:st.hours,
+    materials:!!st.mat, frequency:st.freq, date:st.date, start:`${pad(st.time)}:00`, preferred:st.cleaners,
+    name:$("#name").value.trim(), phone:$("#phone").value.trim(), address:$("#addr").value.trim(), notes:$("#notes").value.trim(),
+    rate:rate(), total:total()};
+}
+function sendToForm(){
+  if(!CONFIG.formId) return;
+  const data=JSON.stringify(bookingData());
+  if(SENT_FOR===data) return;          // don't send the same booking twice
+  SENT_FOR=data;
+  try{
+    fetch(`https://docs.google.com/forms/d/e/${CONFIG.formId}/formResponse`,
+      {method:"POST", mode:"no-cors", keepalive:true, body:new URLSearchParams({[CONFIG.formEntry]: data})}).catch(()=>{});
+  }catch(e){}
+}
 function bookingText(){
   const d=dateOf(st.date);
   return [
-    "*New booking — Fast Shine*",
+    `*New booking — Fast Shine* (Ref ${REF})`,
     "",
     `Service: ${svcObj().name}`,
     `Cleaners: ${st.ladies}`,
@@ -734,12 +753,15 @@ function bookingText(){
   ].filter(l=>l!==null).join("\n");
 }
 function buildSummary(){
+  if(!REF) REF="FS-"+Math.random().toString(36).slice(2,7).toUpperCase();
   const d=dateOf(st.date);
   const rows=[["Service",svcObj().name],["Team",`${st.ladies} cleaner${st.ladies>1?"s":""} · ${st.hours} hrs`],["Materials",st.mat?"We bring them":"Your own"],["When",`${fmtDate(d)} · ${fmtTime(st.time)}`],["Frequency",st.freq],["Cleaner",cleanerText()],["Where",`${$("#addr").value.trim()}, ${st.area}`],["Total",`AED ${total()}`]];
   $("#summary").innerHTML=rows.map(r=>`<div><span>${r[0]}</span><span>${r[1].replace(/</g,"&lt;")}</span></div>`).join("");
   $("#waSend").href=`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(bookingText())}`;
 }
+$("#waSend").addEventListener("click",sendToForm);
 $("#copyBtn").addEventListener("click",async()=>{
+  sendToForm();
   try{ await navigator.clipboard.writeText(bookingText()); $("#copyBtn").textContent="Copied ✓"; }
   catch(e){ $("#copyBtn").textContent="Couldn't copy"; }
   setTimeout(()=>$("#copyBtn").textContent="Copy details",1800);
