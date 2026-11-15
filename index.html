@@ -46,10 +46,11 @@ h1 em{font-style:normal;color:var(--teal);position:relative}
 h1 em svg{position:absolute;right:-26px;top:-14px;width:28px}
 .lead{font-size:1.12rem;color:var(--muted);max-width:520px}
 .price-tags{display:flex;gap:14px;margin:30px 0;flex-wrap:wrap}
-.ptag{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:16px 20px;min-width:180px}
+.ptag{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;min-width:150px;flex:1}
 .ptag b{font-size:1.9rem;letter-spacing:-.03em}
 .ptag b span{font-size:.95rem;font-weight:600;color:var(--muted)}
 .ptag p{font-size:.85rem;color:var(--muted)}
+.matnote{color:var(--muted);font-size:.9rem;margin:-14px 0 24px}
 a.ptag{text-decoration:none;color:inherit;cursor:pointer;border-width:1.5px;transition:border-color .15s,transform .15s,box-shadow .15s}
 a.ptag:hover{border-color:var(--teal);transform:translateY(-2px);box-shadow:0 10px 24px rgba(8,96,95,.12)}
 a.ptag em{display:block;font-style:normal;font-weight:700;font-size:.8rem;color:var(--teal);margin-top:6px}
@@ -81,6 +82,7 @@ a.ptag.sel em{color:#9A6A00}
 .opt.sel{border-color:var(--teal);background:var(--teal-l);box-shadow:inset 0 0 0 1px var(--teal)}
 .opt b{display:block;font-size:.92rem}
 .opt small{color:var(--muted);font-size:.78rem}
+.opts3{grid-template-columns:repeat(3,1fr)}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .stepper{display:flex;align-items:center;border:1.5px solid var(--line);border-radius:12px;overflow:hidden;height:48px}
 .stepper button{width:46px;height:100%;font-size:1.3rem;font-weight:700;color:var(--teal);background:var(--bg)}
@@ -146,6 +148,7 @@ h2.t{font-size:clamp(1.8rem,3.2vw,2.5rem);letter-spacing:-.03em;line-height:1.12
 .why p{color:rgba(255,255,255,.72)}
 .why .ico{background:rgba(229,168,35,.16)}
 .rates{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:760px;margin:40px auto 0}
+.rates3{grid-template-columns:repeat(3,1fr);max-width:980px}
 .rate{background:#fff;border:1.5px solid var(--line);border-radius:20px;padding:30px;position:relative}
 .rate.hl{border-color:var(--gold);box-shadow:0 18px 44px rgba(229,168,35,.18)}
 .rate .badge{position:absolute;top:-12px;left:30px;background:var(--gold);color:#2b1d00;font-size:.72rem;font-weight:800;padding:4px 10px;border-radius:999px;letter-spacing:.06em;text-transform:uppercase}
@@ -181,7 +184,7 @@ footer{padding:40px 0 110px;color:var(--muted);font-size:.88rem}
 }
 @media (max-width:640px){
   .hero{padding:32px 0 48px}
-  .how,.whys,.rates,.svcs{grid-template-columns:1fr}
+  .how,.whys,.rates,.rates3,.svcs{grid-template-columns:1fr}
   .ticks{grid-template-columns:1fr}
   .book-body{padding:18px 16px 4px}.book-foot{padding:14px 16px}.book-head{padding:16px}
   .times{grid-template-columns:repeat(3,1fr)}
@@ -236,9 +239,9 @@ footer{padding:40px 0 110px;color:var(--muted);font-size:.88rem}
       <h1>A spotless home,<br><em>booked in 60 seconds.<svg viewBox="0 0 24 24"><use href="#spark"/></svg></em></h1>
       <p class="lead">Trained, reliable cleaning ladies at your door. Pick your hours, see your price instantly, and confirm on WhatsApp. No calls, no waiting.</p>
       <div class="price-tags">
-        <a class="ptag sel" href="#book" data-mat="0"><b><span>AED</span> 25<span>/hr</span></b><p>per cleaner · you provide materials</p><em><i class="a">Tap to choose →</i><i class="b">✓ Selected</i></em></a>
-        <a class="ptag" href="#book" data-mat="1"><b><span>AED</span> 30<span>/hr</span></b><p>per cleaner · we bring everything</p><em><i class="a">Tap to choose →</i><i class="b">✓ Selected</i></em></a>
+        <div id="heroTags" style="display:contents"></div>
       </div>
+      <p class="matnote">Per cleaner, per hour. Want us to bring the cleaning materials? Just <b>+AED <span class="matFee"></span>/hr</b>.</p>
       <ul class="ticks">
         <li>Clear hourly pricing</li>
         <li>Same-week slots</li>
@@ -258,6 +261,10 @@ footer{padding:40px 0 110px;color:var(--muted);font-size:.88rem}
         <!-- STEP 1 -->
         <div class="step active" data-step="1">
           <div class="field">
+            <label class="lbl">Where are you?</label>
+            <div class="opts opts3" id="areaOpts"></div>
+          </div>
+          <div class="field">
             <label class="lbl">What needs cleaning?</label>
             <div class="opts" id="svcOpts"></div>
           </div>
@@ -275,7 +282,7 @@ footer{padding:40px 0 110px;color:var(--muted);font-size:.88rem}
             <label class="lbl">Cleaning materials</label>
             <div class="toggle" id="matToggle">
               <button type="button" data-v="0" class="sel">I have my own</button>
-              <button type="button" data-v="1">Bring them (+AED 5/hr)</button>
+              <button type="button" data-v="1">Bring them (+AED <span class="matFee"></span>/hr)</button>
             </div>
           </div>
           <div class="field">
@@ -307,11 +314,7 @@ footer{padding:40px 0 110px;color:var(--muted);font-size:.88rem}
             <div class="field" id="f-name"><label class="lbl">Your name</label><input id="name" autocomplete="name" placeholder="e.g. Fatima"><div class="err">Please enter your name.</div></div>
             <div class="field" id="f-phone"><label class="lbl">Mobile number</label><input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="05X XXX XXXX"><div class="err">Enter a valid UAE mobile.</div></div>
           </div>
-          <div class="field" id="f-area"><label class="lbl">Area</label>
-            <select id="area"><option value="">Choose your area…</option></select>
-            <div class="err">Please choose your area.</div>
-          </div>
-          <div class="field" id="f-addr"><label class="lbl">Building / villa & flat no.</label><input id="addr" autocomplete="street-address" placeholder="e.g. Al Rashidiya Tower 2, Flat 1405"><div class="err">Please add your address.</div></div>
+          <div class="field" id="f-addr"><label class="lbl">Address in <span id="areaLbl" style="color:var(--teal-d);font-weight:800"></span></label><input id="addr" autocomplete="street-address" placeholder="Area, building / villa & flat no."><div class="err">Please add your address.</div></div>
           <div class="field"><label class="lbl">Anything we should know? <span>(optional)</span></label><textarea id="notes" placeholder="Pets, focus areas, parking, access code…"></textarea></div>
         </div>
 
@@ -388,23 +391,9 @@ footer{padding:40px 0 110px;color:var(--muted);font-size:.88rem}
   <div class="wrap center">
     <span class="eyebrow">Pricing</span>
     <h2 class="t">Simple hourly rates. That's it.</h2>
-    <p class="sub">No hidden fees. Your total is cleaners × hours × rate.</p>
-    <div class="rates" style="text-align:left">
-      <div class="rate">
-        <h3>Without materials</h3>
-        <div class="big">AED 25<span> / hr / cleaner</span></div>
-        <ul><li>You provide cleaning products</li><li>All services available</li><li>Minimum <span class="minH"></span> hours</li></ul>
-        <a class="btn btn-ghost" href="#book" data-mat="0">Book at AED 25</a>
-      </div>
-      <div class="rate hl">
-        <span class="badge">Most convenient</span>
-        <h3>With materials</h3>
-        <div class="big">AED 30<span> / hr / cleaner</span></div>
-        <ul><li>We bring all products & tools</li><li>All services available</li><li>Minimum <span class="minH"></span> hours</li></ul>
-        <a class="btn btn-primary" href="#book" data-mat="1">Book at AED 30</a>
-      </div>
-    </div>
-    <p class="example">Example: 2 cleaners × 4 hours with materials = <b>AED 240</b></p>
+    <p class="sub">No hidden fees. Your total is cleaners × hours × your area's rate.</p>
+    <div class="rates rates3" style="text-align:left" id="rateCards"></div>
+    <p class="example" id="example"></p>
   </div>
 </section>
 
@@ -446,17 +435,17 @@ footer{padding:40px 0 110px;color:var(--muted);font-size:.88rem}
 </footer>
 
 <a class="wa-float waLink" href="#" target="_blank" rel="noopener" aria-label="Chat on WhatsApp" style="color:#fff"><svg width="30" height="30"><use href="#wa"/></svg></a>
-<div class="mbar"><div>From <b>AED 25/hr</b>per cleaner</div><a class="btn btn-primary" href="#book">Book now</a></div>
+<div class="mbar"><div>From <b class="minRate"></b>per cleaner</div><a class="btn btn-primary" href="#book">Book now</a></div>
 
 <script>
 /* ===== EDIT THESE ===== */
 const CONFIG = {
   whatsapp: "971554606774",           // company WhatsApp number, digits only with country code
-  rateNoMat: 25, rateMat: 30,          // AED per hour per cleaner
+  rates: {"Ajman":25, "Umm Al Quwain":28, "Sharjah":30}, // AED per hour per cleaner, by emirate
+  materialsFee: 5,                     // extra AED per hour per cleaner when we bring materials
   minHours: 2, maxHours: 10, maxLadies: 4,
   openHour: 8, lastStart: 17,          // first and last start time (24h)
   daysAhead: 14,
-  areas: ["Ajman","Sharjah","Dubai","Umm Al Quwain","Other (tell us in notes)"]
 };
 const SERVICES = [
   {id:"regular", name:"Regular home cleaning", short:"Weekly upkeep", hours:3, desc:"Dusting, mopping, kitchen, bathrooms, beds made. The everyday reset.", icon:'<path d="M3 11l9-7 9 7v9H3z"/><path d="M9 20v-6h6v6"/>'},
@@ -467,7 +456,7 @@ const SERVICES = [
 /* ====================== */
 
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
-const st = {svc:"regular", ladies:1, hours:3, mat:0, freq:"One-time", date:null, time:null, step:1};
+const st = {area:"Ajman", svc:"regular", ladies:1, hours:3, mat:0, freq:"One-time", date:null, time:null, step:1};
 const DAYS=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"], MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 $("#yr").textContent = new Date().getFullYear();
@@ -475,9 +464,20 @@ const prettyNum = "+" + CONFIG.whatsapp.replace(/^(\d{3})(\d{2})(\d{3})(\d+)$/,"
 $$(".waNumText").forEach(e=>e.textContent=prettyNum);
 $$(".waLink").forEach(a=>a.href=`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent("Hi Fast Shine! I'd like to book a cleaning.")}`);
 $$(".minH").forEach(e=>e.textContent=CONFIG.minHours);
-CONFIG.areas.forEach(a=>$("#area").insertAdjacentHTML("beforeend",`<option>${a}</option>`));
+const AREAS = Object.keys(CONFIG.rates);
+const MINRATE = Math.min(...Object.values(CONFIG.rates));
+$$(".matFee").forEach(e=>e.textContent=CONFIG.materialsFee);
+$$(".minRate").forEach(e=>e.textContent=`AED ${MINRATE}/hr`);
+$("#heroTags").innerHTML = AREAS.map(a=>`<a class="ptag" href="#book" data-area="${a}"><b><span>AED</span> ${CONFIG.rates[a]}<span>/hr</span></b><p>${a}</p><em><i class="a">Tap to choose →</i><i class="b">✓ Selected</i></em></a>`).join("");
+$("#rateCards").innerHTML = AREAS.map((a,i)=>`<div class="rate ${i===0?"hl":""}">${i===0?'<span class="badge">Best rate</span>':""}<h3>${a}</h3><div class="big">AED ${CONFIG.rates[a]}<span> / hr / cleaner</span></div><ul><li>All services available</li><li>+AED ${CONFIG.materialsFee}/hr if we bring materials</li><li>Minimum ${CONFIG.minHours} hours</li></ul><a class="btn ${i===0?"btn-primary":"btn-ghost"}" href="#book" data-area="${a}">Book in ${a}</a></div>`).join("");
+const ex = CONFIG.rates[AREAS[0]]+CONFIG.materialsFee;
+$("#example").innerHTML = `Example: 2 cleaners × 4 hours in ${AREAS[0]} with materials = <b>AED ${2*4*ex}</b>`;
+function renderAreaOpts(){
+  $("#areaOpts").innerHTML = AREAS.map(a=>`<button type="button" class="opt ${a===st.area?"sel":""}" data-a="${a}"><b>${a}</b><small>AED ${CONFIG.rates[a]}/hr</small></button>`).join("");
+}
+$("#areaOpts").addEventListener("click",e=>{const b=e.target.closest(".opt"); if(!b)return; st.area=b.dataset.a; renderAreaOpts(); update();});
 
-const rate = () => st.mat ? CONFIG.rateMat : CONFIG.rateNoMat;
+const rate = () => CONFIG.rates[st.area] + (st.mat ? CONFIG.materialsFee : 0);
 const total = () => st.ladies * st.hours * rate();
 const svcObj = () => SERVICES.find(s=>s.id===st.svc);
 const fmtTime = h => { const ap=h<12?"AM":"PM"; const hh=h%12||12; return `${hh}:00 ${ap}`; };
@@ -491,10 +491,10 @@ $("#svcOpts").addEventListener("click",e=>{
   const b=e.target.closest(".opt"); if(!b) return;
   st.svc=b.dataset.svc; st.hours=Math.max(st.hours, svcObj().hours); renderSvcOpts(); update();
 });
-$("#svcCards").innerHTML = SERVICES.map(s=>`<div class="svc"><div class="ico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0E8C8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${s.icon}</svg></div><h3>${s.name}</h3><p>${s.desc}</p><div class="meta">Typically ${s.hours}+ hrs · from AED ${s.hours*CONFIG.rateNoMat}</div><a class="btn btn-primary" href="#book" data-pick="${s.id}">Book this</a></div>`).join("");
+$("#svcCards").innerHTML = SERVICES.map(s=>`<div class="svc"><div class="ico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0E8C8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${s.icon}</svg></div><h3>${s.name}</h3><p>${s.desc}</p><div class="meta">Typically ${s.hours}+ hrs · from AED ${s.hours*MINRATE}</div><a class="btn btn-primary" href="#book" data-pick="${s.id}">Book this</a></div>`).join("");
 document.addEventListener("click",e=>{
   const p=e.target.closest("[data-pick]"); if(p){ st.svc=p.dataset.pick; st.hours=svcObj().hours; goStep(1); renderSvcOpts(); update(); }
-  const m=e.target.closest("[data-mat]"); if(m){ st.mat=+m.dataset.mat; syncToggle("#matToggle",String(st.mat)); goStep(1); update(); }
+  const ar=e.target.closest("[data-area]"); if(ar){ st.area=ar.dataset.area; renderAreaOpts(); goStep(1); update(); }
 });
 
 /* steppers & toggles */
@@ -534,7 +534,8 @@ $("#times").addEventListener("click",e=>{const b=e.target.closest(".time"); if(!
 
 /* totals */
 function update(){
-  $$("a.ptag").forEach(a=>a.classList.toggle("sel", +a.dataset.mat===st.mat));
+  $$("a.ptag").forEach(a=>a.classList.toggle("sel", a.dataset.area===st.area));
+  $("#areaLbl").textContent=st.area;
   $("#ladiesOut").textContent=st.ladies; $("#hoursOut").textContent=st.hours;
   $("#total").textContent=total();
   $("#totalBreak").textContent=`${st.ladies} cleaner${st.ladies>1?"s":""} × ${st.hours} hrs × AED ${rate()}`;
@@ -561,11 +562,10 @@ function validate3(){
   const chk=(id,cond)=>{ $("#f-"+id).classList.toggle("invalid",!cond); if(!cond) ok=false; };
   chk("name", $("#name").value.trim().length>1);
   chk("phone", validPhone($("#phone").value));
-  chk("area", !!$("#area").value);
   chk("addr", $("#addr").value.trim().length>3);
   return ok;
 }
-["name","phone","area","addr"].forEach(id=>$("#"+id).addEventListener("input",()=>$("#f-"+id).classList.remove("invalid")));
+["name","phone","addr"].forEach(id=>$("#"+id).addEventListener("input",()=>$("#f-"+id).classList.remove("invalid")));
 $("#nextBtn").addEventListener("click",()=>{
   if(st.step===2 && (!st.date || st.time===null)){ $("#timeErr").style.display="block"; return; }
   if(st.step===3 && !validate3()) return;
@@ -590,7 +590,7 @@ function bookingText(){
     "",
     `Name: ${$("#name").value.trim()}`,
     `Phone: ${$("#phone").value.trim()}`,
-    `Area: ${$("#area").value}`,
+    `Emirate: ${st.area}`,
     `Address: ${$("#addr").value.trim()}`,
     $("#notes").value.trim() ? `Notes: ${$("#notes").value.trim()}` : null,
     "",
@@ -599,7 +599,7 @@ function bookingText(){
 }
 function buildSummary(){
   const d=new Date(st.date);
-  const rows=[["Service",svcObj().name],["Team",`${st.ladies} cleaner${st.ladies>1?"s":""} · ${st.hours} hrs`],["Materials",st.mat?"We bring them":"Your own"],["When",`${fmtDate(d)} · ${fmtTime(st.time)}`],["Frequency",st.freq],["Where",`${$("#addr").value.trim()}, ${$("#area").value}`],["Total",`AED ${total()}`]];
+  const rows=[["Service",svcObj().name],["Team",`${st.ladies} cleaner${st.ladies>1?"s":""} · ${st.hours} hrs`],["Materials",st.mat?"We bring them":"Your own"],["When",`${fmtDate(d)} · ${fmtTime(st.time)}`],["Frequency",st.freq],["Where",`${$("#addr").value.trim()}, ${st.area}`],["Total",`AED ${total()}`]];
   $("#summary").innerHTML=rows.map(r=>`<div><span>${r[0]}</span><span>${r[1].replace(/</g,"&lt;")}</span></div>`).join("");
   $("#waSend").href=`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(bookingText())}`;
 }
@@ -609,7 +609,7 @@ $("#copyBtn").addEventListener("click",async()=>{
   setTimeout(()=>$("#copyBtn").textContent="Copy details",1800);
 });
 
-renderSvcOpts(); update();
+renderAreaOpts(); renderSvcOpts(); update();
 </script>
 </body>
 </html>
