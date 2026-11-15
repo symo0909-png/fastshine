@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fast Shine Cleaning Services — Book a Cleaner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --teal:#0E8C8C; --teal-d:#08605F; --teal-l:#E3F4F3; --gold:#E5A823; --gold-l:#FDF3DC;
+  --ink:#13262B; --muted:#5B6E73; --line:#DCE7E8; --bg:#F7FBFB; --white:#fff; --wa:#1FA855;
+  --r:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:"Plus Jakarta Sans",system-ui,sans-serif;color:var(--ink);background:var(--bg);line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+.wrap{max-width:1160px;margin:0 auto;padding:0 20px}
+
+/* header */
+header{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:68px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:800;font-size:1.12rem;letter-spacing:-.01em}
+.brand small{display:block;font-weight:600;font-size:.68rem;color:var(--muted);letter-spacing:.14em;text-transform:uppercase}
+.nav-links{display:flex;gap:26px;align-items:center;font-weight:600;font-size:.94rem}
+.nav-links a{text-decoration:none;color:var(--muted)}
+.nav-links a:hover{color:var(--teal)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 22px;border-radius:999px;font-weight:700;text-decoration:none;transition:transform .15s, box-shadow .15s, background .15s}
+.btn-primary{background:var(--teal);color:#fff;box-shadow:0 6px 18px rgba(14,140,140,.28)}
+.btn-primary:hover{background:var(--teal-d);transform:translateY(-1px)}
+.btn-gold{background:var(--gold);color:#2b1d00}
+.btn-ghost{border:1.5px solid var(--line);background:#fff}
+.btn-wa{background:var(--wa);color:#fff;box-shadow:0 6px 18px rgba(31,168,85,.3)}
+.btn[disabled]{opacity:.45;pointer-events:none}
+
+/* hero */
+.hero{position:relative;overflow:hidden;background:linear-gradient(160deg,#fff 0%,var(--teal-l) 100%);padding:56px 0 72px}
+.hero::after{content:"";position:absolute;right:-180px;top:-160px;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(229,168,35,.16),transparent 65%)}
+.hero-grid{display:grid;grid-template-columns:1.02fr 1fr;gap:48px;align-items:start;position:relative;z-index:1}
+.pill{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);padding:7px 14px;border-radius:999px;font-size:.84rem;font-weight:600;color:var(--teal-d)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--wa);box-shadow:0 0 0 4px rgba(31,168,85,.18)}
+h1{font-size:clamp(2.2rem,4.6vw,3.6rem);line-height:1.05;letter-spacing:-.035em;font-weight:800;margin:20px 0 18px}
+h1 em{font-style:normal;color:var(--teal);position:relative}
+h1 em svg{position:absolute;right:-26px;top:-14px;width:28px}
+.lead{font-size:1.12rem;color:var(--muted);max-width:520px}
+.price-tags{display:flex;gap:14px;margin:30px 0;flex-wrap:wrap}
+.ptag{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:16px 20px;min-width:180px}
+.ptag b{font-size:1.9rem;letter-spacing:-.03em}
+.ptag b span{font-size:.95rem;font-weight:600;color:var(--muted)}
+.ptag p{font-size:.85rem;color:var(--muted)}
+.ptag.hl{border-color:var(--gold);background:var(--gold-l)}
+.ticks{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px;max-width:500px;font-weight:600;font-size:.95rem}
+.ticks li{list-style:none;display:flex;gap:9px;align-items:center}
+.ticks li::before{content:"";flex:none;width:20px;height:20px;border-radius:50%;background:var(--teal) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5 9-10'/%3E%3C/svg%3E") center/12px no-repeat}
+
+/* booking card */
+.book{background:#fff;border-radius:22px;box-shadow:0 24px 60px rgba(8,96,95,.16),0 2px 6px rgba(0,0,0,.04);border:1px solid var(--line);overflow:hidden;scroll-margin-top:90px}
+.book-head{background:var(--teal-d);color:#fff;padding:18px 24px;display:flex;justify-content:space-between;align-items:center}
+.book-head h2{font-size:1.15rem;font-weight:800;letter-spacing:-.01em}
+.book-head p{font-size:.82rem;opacity:.8}
+.steps{display:flex;gap:6px}
+.steps i{width:28px;height:5px;border-radius:9px;background:rgba(255,255,255,.25);transition:background .2s}
+.steps i.on{background:var(--gold)}
+.book-body{padding:22px 24px 8px}
+.step{display:none;animation:fade .25s ease}
+.step.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.lbl{display:block;font-weight:700;font-size:.86rem;margin:0 0 8px}
+.lbl span{font-weight:500;color:var(--muted)}
+.field{margin-bottom:18px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.opt{border:1.5px solid var(--line);border-radius:12px;padding:11px 12px;text-align:left;transition:.15s;background:#fff}
+.opt:hover{border-color:var(--teal)}
+.opt.sel{border-color:var(--teal);background:var(--teal-l);box-shadow:inset 0 0 0 1px var(--teal)}
+.opt b{display:block;font-size:.92rem}
+.opt small{color:var(--muted);font-size:.78rem}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.stepper{display:flex;align-items:center;border:1.5px solid var(--line);border-radius:12px;overflow:hidden;height:48px}
+.stepper button{width:46px;height:100%;font-size:1.3rem;font-weight:700;color:var(--teal);background:var(--bg)}
+.stepper button:hover{background:var(--teal-l)}
+.stepper output{flex:1;text-align:center;font-weight:800;font-size:1.05rem}
+.toggle{display:flex;background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:4px}
+.toggle button{flex:1;padding:10px 6px;border-radius:9px;font-weight:700;font-size:.86rem;color:var(--muted)}
+.toggle button.sel{background:#fff;color:var(--teal-d);box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.dates{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin}
+.date{flex:none;width:62px;border:1.5px solid var(--line);border-radius:12px;padding:8px 0;text-align:center;background:#fff;transition:.15s}
+.date small{display:block;font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.date b{font-size:1.2rem}
+.date em{display:block;font-style:normal;font-size:.68rem;color:var(--muted)}
+.date.sel{border-color:var(--teal);background:var(--teal);color:#fff}
+.date.sel small,.date.sel em{color:rgba(255,255,255,.85)}
+.times{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.time{border:1.5px solid var(--line);border-radius:10px;padding:9px 0;font-weight:700;font-size:.86rem;background:#fff}
+.time.sel{border-color:var(--teal);background:var(--teal);color:#fff}
+.time[disabled]{opacity:.35;text-decoration:line-through;pointer-events:none}
+input,select,textarea{width:100%;font:inherit;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff;color:var(--ink);outline:none;transition:border .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(14,140,140,.12)}
+textarea{resize:vertical;min-height:64px}
+.err{color:#C0392B;font-size:.8rem;margin-top:5px;display:none}
+.invalid input,.invalid select{border-color:#C0392B}
+.invalid .err{display:block}
+.book-foot{border-top:1px solid var(--line);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:#FCFEFE}
+.total small{display:block;font-size:.75rem;color:var(--muted);font-weight:600}
+.total b{font-size:1.6rem;letter-spacing:-.03em}
+.total span{font-size:.78rem;color:var(--muted)}
+.foot-btns{display:flex;gap:8px}
+.summary{background:var(--bg);border:1px dashed var(--line);border-radius:12px;padding:14px 16px;font-size:.88rem;margin-bottom:16px}
+.summary div{display:flex;justify-content:space-between;gap:10px;padding:3px 0}
+.summary div span:first-child{color:var(--muted)}
+.summary div span:last-child{font-weight:700;text-align:right}
+.done{text-align:center;padding:26px 6px 22px}
+.done .ok{width:68px;height:68px;border-radius:50%;background:var(--teal-l);display:grid;place-items:center;margin:0 auto 14px}
+.done h3{font-size:1.35rem;margin-bottom:6px}
+.done p{color:var(--muted);font-size:.93rem;max-width:340px;margin:0 auto 18px}
+.note{font-size:.76rem;color:var(--muted);text-align:center;padding:4px 0 14px}
+
+/* sections */
+section{padding:84px 0}
+.eyebrow{color:var(--teal);font-weight:800;font-size:.78rem;letter-spacing:.16em;text-transform:uppercase}
+h2.t{font-size:clamp(1.8rem,3.2vw,2.5rem);letter-spacing:-.03em;line-height:1.12;margin:8px 0 12px;font-weight:800}
+.sub{color:var(--muted);max-width:560px}
+.center{text-align:center}.center .sub{margin:0 auto}
+.how{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:44px}
+.how div{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:28px}
+.num{width:42px;height:42px;border-radius:12px;background:var(--gold-l);color:#9A6A00;font-weight:800;display:grid;place-items:center;margin-bottom:16px}
+.how h3,.svc h3,.why h3{font-size:1.1rem;margin-bottom:6px}
+.how p,.svc p,.why p{color:var(--muted);font-size:.94rem}
+.svcs{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:44px}
+.svc{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:24px;display:flex;flex-direction:column;transition:.2s}
+.svc:hover{transform:translateY(-4px);box-shadow:0 18px 40px rgba(8,96,95,.12);border-color:var(--teal)}
+.ico{width:50px;height:50px;border-radius:14px;background:var(--teal-l);display:grid;place-items:center;margin-bottom:16px}
+.svc .meta{font-size:.82rem;font-weight:700;color:var(--teal-d);margin:12px 0 16px}
+.svc .btn{margin-top:auto;padding:11px 16px;font-size:.9rem}
+.band{background:var(--teal-d);color:#fff}
+.band .sub{color:rgba(255,255,255,.75)}
+.band .eyebrow{color:var(--gold)}
+.whys{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:40px}
+.why{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:var(--r);padding:26px}
+.why p{color:rgba(255,255,255,.72)}
+.why .ico{background:rgba(229,168,35,.16)}
+.rates{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:760px;margin:40px auto 0}
+.rate{background:#fff;border:1.5px solid var(--line);border-radius:20px;padding:30px;position:relative}
+.rate.hl{border-color:var(--gold);box-shadow:0 18px 44px rgba(229,168,35,.18)}
+.rate .badge{position:absolute;top:-12px;left:30px;background:var(--gold);color:#2b1d00;font-size:.72rem;font-weight:800;padding:4px 10px;border-radius:999px;letter-spacing:.06em;text-transform:uppercase}
+.rate h3{font-size:1.05rem}
+.rate .big{font-size:3rem;font-weight:800;letter-spacing:-.04em;margin:8px 0 2px}
+.rate .big span{font-size:1rem;color:var(--muted);font-weight:600}
+.rate ul{margin:16px 0 22px;padding-left:0}
+.rate li{list-style:none;padding:5px 0;color:var(--muted);font-size:.93rem;border-bottom:1px dashed var(--line)}
+.rate .btn{width:100%}
+.example{text-align:center;color:var(--muted);font-size:.9rem;margin-top:22px}
+.faq{max-width:760px;margin:36px auto 0}
+details{background:#fff;border:1px solid var(--line);border-radius:14px;margin-bottom:10px;padding:0 20px}
+summary{cursor:pointer;font-weight:700;padding:18px 0;list-style:none;display:flex;justify-content:space-between;align-items:center}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-size:1.4rem;color:var(--teal);font-weight:600}
+details[open] summary::after{content:"–"}
+details p{color:var(--muted);padding-bottom:18px;font-size:.95rem}
+.cta{background:linear-gradient(120deg,var(--teal) 0%,var(--teal-d) 100%);color:#fff;border-radius:28px;padding:56px 40px;text-align:center;position:relative;overflow:hidden}
+.cta h2{font-size:clamp(1.8rem,3.4vw,2.6rem);letter-spacing:-.03em;margin-bottom:10px}
+.cta p{opacity:.85;margin-bottom:26px}
+.cta .btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+footer{padding:40px 0 110px;color:var(--muted);font-size:.88rem}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:28px}
+
+/* floating */
+.wa-float{position:fixed;right:20px;bottom:22px;z-index:50;width:58px;height:58px;border-radius:50%;background:var(--wa);display:grid;place-items:center;box-shadow:0 10px 26px rgba(31,168,85,.4);text-decoration:none}
+.mbar{display:none}
+
+@media (max-width:980px){
+  .hero-grid{grid-template-columns:1fr}
+  .svcs{grid-template-columns:1fr 1fr}
+  .nav-links a:not(.btn){display:none}
+}
+@media (max-width:640px){
+  .hero{padding:32px 0 48px}
+  .how,.whys,.rates,.svcs{grid-template-columns:1fr}
+  .ticks{grid-template-columns:1fr}
+  .book-body{padding:18px 16px 4px}.book-foot{padding:14px 16px}.book-head{padding:16px}
+  .times{grid-template-columns:repeat(3,1fr)}
+  .ptag{min-width:0;flex:1}
+  section{padding:60px 0}
+  .cta{padding:40px 22px}
+  .wa-float{bottom:84px}
+  .mbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:45;background:#fff;border-top:1px solid var(--line);padding:10px 14px;gap:10px;align-items:center;box-shadow:0 -6px 20px rgba(0,0,0,.06)}
+  .mbar div{flex:1;font-size:.78rem;color:var(--muted)}
+  .mbar b{display:block;color:var(--ink);font-size:1rem}
+  .mbar .btn{padding:12px 20px}
+}
+</style>
+</head>
+<body>
+
+<!-- Inline logo (reused) -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="logo" viewBox="0 0 64 64">
+      <path d="M8 26h12M4 34h14M10 42h10" stroke="#0E8C8C" stroke-width="3.2" stroke-linecap="round" opacity=".55"/>
+      <path d="M40 6C40 6 22 26 22 40a18 18 0 0 0 36 0C58 26 40 6 40 6Z" fill="#0E8C8C"/>
+      <path d="M31 40a9 9 0 0 0 9 9" stroke="#fff" stroke-width="3.4" stroke-linecap="round" fill="none" opacity=".85"/>
+      <path d="M53 10l1.8 4.6L59.4 16l-4.6 1.8L53 22.4l-1.8-4.6L46.6 16l4.6-1.4Z" fill="#E5A823"/>
+    </symbol>
+    <symbol id="spark" viewBox="0 0 24 24"><path d="M12 1l2.6 7.4L22 11l-7.4 2.6L12 21l-2.6-7.4L2 11l7.4-2.6Z" fill="#E5A823"/></symbol>
+    <symbol id="wa" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.2 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.5-.3Z"/></symbol>
+  </defs>
+</svg>
+
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="#top">
+      <svg width="40" height="40"><use href="#logo"/></svg>
+      <span>Fast Shine<small>Cleaning Services</small></span>
+    </a>
+    <nav class="nav-links">
+      <a href="#services">Services</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+      <a class="btn btn-primary" href="#book" style="padding:10px 20px">Book now</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+<!-- HERO + BOOKING -->
+<div class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="pill"><span class="dot"></span>Booking open — 7 days a week</span>
+      <h1>A spotless home,<br><em>booked in 60 seconds.<svg viewBox="0 0 24 24"><use href="#spark"/></svg></em></h1>
+      <p class="lead">Trained, reliable cleaning ladies at your door. Pick your hours, see your price instantly, and confirm on WhatsApp. No calls, no waiting.</p>
+      <div class="price-tags">
+        <div class="ptag"><b><span>AED</span> 25<span>/hr</span></b><p>per cleaner · you provide materials</p></div>
+        <div class="ptag hl"><b><span>AED</span> 30<span>/hr</span></b><p>per cleaner · we bring everything</p></div>
+      </div>
+      <ul class="ticks">
+        <li>Clear hourly pricing</li>
+        <li>Same-week slots</li>
+        <li>Supplies available</li>
+        <li>Confirm on WhatsApp</li>
+      </ul>
+    </div>
+
+    <!-- BOOKING CARD -->
+    <div class="book" id="book">
+      <div class="book-head">
+        <div><h2 id="stepTitle">Build your clean</h2><p id="stepSub">Step 1 of 3</p></div>
+        <div class="steps"><i class="on"></i><i></i><i></i></div>
+      </div>
+
+      <div class="book-body">
+        <!-- STEP 1 -->
+        <div class="step active" data-step="1">
+          <div class="field">
+            <label class="lbl">What needs cleaning?</label>
+            <div class="opts" id="svcOpts"></div>
+          </div>
+          <div class="row2 field">
+            <div>
+              <label class="lbl">Cleaners</label>
+              <div class="stepper"><button type="button" data-k="ladies" data-d="-1" aria-label="Fewer cleaners">−</button><output id="ladiesOut">1</output><button type="button" data-k="ladies" data-d="1" aria-label="More cleaners">+</button></div>
+            </div>
+            <div>
+              <label class="lbl">Hours</label>
+              <div class="stepper"><button type="button" data-k="hours" data-d="-1" aria-label="Fewer hours">−</button><output id="hoursOut">3</output><button type="button" data-k="hours" data-d="1" aria-label="More hours">+</button></div>
+            </div>
+          </div>
+          <div class="field">
+            <label class="lbl">Cleaning materials</label>
+            <div class="toggle" id="matToggle">
+              <button type="button" data-v="0" class="sel">I have my own</button>
+              <button type="button" data-v="1">Bring them (+AED 5/hr)</button>
+            </div>
+          </div>
+          <div class="field">
+            <label class="lbl">How often?</label>
+            <div class="toggle" id="freqToggle">
+              <button type="button" data-v="One-time" class="sel">One-time</button>
+              <button type="button" data-v="Weekly">Weekly</button>
+              <button type="button" data-v="Every 2 weeks">Every 2 wks</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="step" data-step="2">
+          <div class="field">
+            <label class="lbl">Pick a day</label>
+            <div class="dates" id="dates"></div>
+          </div>
+          <div class="field">
+            <label class="lbl">Start time</label>
+            <div class="times" id="times"></div>
+            <div class="err" id="timeErr" style="display:none">Please choose a day and a start time.</div>
+          </div>
+        </div>
+
+        <!-- STEP 3 -->
+        <div class="step" data-step="3">
+          <div class="row2">
+            <div class="field" id="f-name"><label class="lbl">Your name</label><input id="name" autocomplete="name" placeholder="e.g. Fatima"><div class="err">Please enter your name.</div></div>
+            <div class="field" id="f-phone"><label class="lbl">Mobile number</label><input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="05X XXX XXXX"><div class="err">Enter a valid UAE mobile.</div></div>
+          </div>
+          <div class="field" id="f-area"><label class="lbl">Area</label>
+            <select id="area"><option value="">Choose your area…</option></select>
+            <div class="err">Please choose your area.</div>
+          </div>
+          <div class="field" id="f-addr"><label class="lbl">Building / villa & flat no.</label><input id="addr" autocomplete="street-address" placeholder="e.g. Al Rashidiya Tower 2, Flat 1405"><div class="err">Please add your address.</div></div>
+          <div class="field"><label class="lbl">Anything we should know? <span>(optional)</span></label><textarea id="notes" placeholder="Pets, focus areas, parking, access code…"></textarea></div>
+        </div>
+
+        <!-- STEP 4: DONE -->
+        <div class="step" data-step="4">
+          <div class="summary" id="summary"></div>
+          <div class="done" style="padding-top:4px">
+            <p style="margin-bottom:14px">Tap below to send your booking to our WhatsApp. We'll reply to confirm your slot and cleaner(s).</p>
+            <a class="btn btn-wa" id="waSend" href="#" target="_blank" rel="noopener" style="width:100%;padding:16px"><svg width="22" height="22"><use href="#wa"/></svg>Send booking on WhatsApp</a>
+            <div style="display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap">
+              <button class="btn btn-ghost" id="copyBtn" type="button" style="padding:10px 16px;font-size:.86rem">Copy details</button>
+              <button class="btn btn-ghost" id="editBtn" type="button" style="padding:10px 16px;font-size:.86rem">Edit booking</button>
+            </div>
+            <p class="note" style="margin-top:14px">WhatsApp not opening? Message us on <b class="waNumText"></b></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="book-foot" id="bookFoot">
+        <div class="total">
+          <small>Your total</small>
+          <b>AED <span id="total" style="font-size:inherit;color:inherit">75</span></b>
+          <span id="totalBreak">1 cleaner × 3 hrs × AED 25</span>
+        </div>
+        <div class="foot-btns">
+          <button class="btn btn-ghost" id="backBtn" type="button" style="display:none">Back</button>
+          <button class="btn btn-primary" id="nextBtn" type="button">Choose time →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section>
+  <div class="wrap center">
+    <span class="eyebrow">How it works</span>
+    <h2 class="t">Booked faster than you can find the mop.</h2>
+    <p class="sub">Three taps and your home is in the calendar.</p>
+    <div class="how" style="text-align:left">
+      <div><span class="num">1</span><h3>Build your clean</h3><p>Choose the service, number of cleaners and hours. Your price updates live, so there are no surprises.</p></div>
+      <div><span class="num">2</span><h3>Pick a slot</h3><p>Choose any day in the next two weeks and a start time that suits you, mornings to early evening.</p></div>
+      <div><span class="num">3</span><h3>Confirm on WhatsApp</h3><p>Your booking goes straight to our team on WhatsApp. We confirm your slot and cleaner(s) quickly.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services" style="background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="wrap">
+    <span class="eyebrow">Services</span>
+    <h2 class="t">Whatever the mess, we've got it.</h2>
+    <p class="sub">Every service is charged by the hour, per cleaner. Tap any service to start a booking with it already selected.</p>
+    <div class="svcs" id="svcCards"></div>
+  </div>
+</section>
+
+<!-- WHY -->
+<section class="band">
+  <div class="wrap">
+    <span class="eyebrow">Why Fast Shine</span>
+    <h2 class="t">Fast. Thorough. Easy to book.</h2>
+    <p class="sub">We built Fast Shine around one idea: getting a clean home should be the easiest thing on your list.</p>
+    <div class="whys">
+      <div class="why"><div class="ico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#E5A823" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 6.5 7 .9-5.1 4.8 1.3 7L12 17.8 5.8 21.2l1.3-7L2 9.4l7-.9Z"/></svg></div><h3>Trained cleaning ladies</h3><p>Our team knows the routine, from kitchens and bathrooms to the corners most people skip.</p></div>
+      <div class="why"><div class="ico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#E5A823" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><h3>On time, every time</h3><p>You pick the start time. We show up for it, and you pay only for the hours you booked.</p></div>
+      <div class="why"><div class="ico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#E5A823" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18v13H3zM8 7V4h8v3"/><path d="M3 12h18"/></svg></div><h3>Supplies on request</h3><p>No products at home? For AED 5 more per hour we bring everything needed for the job.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="wrap center">
+    <span class="eyebrow">Pricing</span>
+    <h2 class="t">Simple hourly rates. That's it.</h2>
+    <p class="sub">No hidden fees. Your total is cleaners × hours × rate.</p>
+    <div class="rates" style="text-align:left">
+      <div class="rate">
+        <h3>Without materials</h3>
+        <div class="big">AED 25<span> / hr / cleaner</span></div>
+        <ul><li>You provide cleaning products</li><li>All services available</li><li>Minimum <span class="minH"></span> hours</li></ul>
+        <a class="btn btn-ghost" href="#book" data-mat="0">Book at AED 25</a>
+      </div>
+      <div class="rate hl">
+        <span class="badge">Most convenient</span>
+        <h3>With materials</h3>
+        <div class="big">AED 30<span> / hr / cleaner</span></div>
+        <ul><li>We bring all products & tools</li><li>All services available</li><li>Minimum <span class="minH"></span> hours</li></ul>
+        <a class="btn btn-primary" href="#book" data-mat="1">Book at AED 30</a>
+      </div>
+    </div>
+    <p class="example">Example: 2 cleaners × 4 hours with materials = <b>AED 240</b></p>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" style="padding-top:0">
+  <div class="wrap center">
+    <span class="eyebrow">FAQ</span>
+    <h2 class="t">Quick answers</h2>
+    <div class="faq" style="text-align:left">
+      <details><summary>How do I pay?</summary><p>You pay after the cleaning is finished. We'll confirm payment options with you on WhatsApp when we confirm your booking.</p></details>
+      <details><summary>How many hours do I need?</summary><p>As a guide, a regular clean of a 1–2 bedroom apartment takes about 3–4 hours with one cleaner. Deep cleans and larger homes take longer, or go faster with two cleaners. Not sure? Book your best guess and add a note, and we'll advise when we confirm.</p></details>
+      <details><summary>What if I need to change or cancel?</summary><p>Just message us on WhatsApp as early as you can and we'll move or cancel your slot.</p></details>
+      <details><summary>Do I need to be home?</summary><p>Not necessarily. Leave access instructions in the notes and we'll arrange it with you when we confirm.</p></details>
+      <details><summary>What's included in "with materials"?</summary><p>Our cleaners bring the cleaning products and tools needed for the job, so you don't have to buy anything.</p></details>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="cta">
+      <h2>Your clean home is 60 seconds away.</h2>
+      <p>Pick your hours, see your price, confirm on WhatsApp.</p>
+      <div class="btns">
+        <a class="btn btn-gold" href="#book">Book a cleaning</a>
+        <a class="btn btn-wa waLink" href="#" target="_blank" rel="noopener"><svg width="20" height="20"><use href="#wa"/></svg>Chat on WhatsApp</a>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <a class="brand" href="#top"><svg width="34" height="34"><use href="#logo"/></svg><span>Fast Shine<small>Cleaning Services</small></span></a>
+    <div>WhatsApp: <b class="waNumText"></b> · Open 7 days</div>
+    <div>© <span id="yr"></span> Fast Shine Cleaning Services</div>
+  </div>
+</footer>
+
+<a class="wa-float waLink" href="#" target="_blank" rel="noopener" aria-label="Chat on WhatsApp" style="color:#fff"><svg width="30" height="30"><use href="#wa"/></svg></a>
+<div class="mbar"><div>From <b>AED 25/hr</b>per cleaner</div><a class="btn btn-primary" href="#book">Book now</a></div>
+
+<script>
+/* ===== EDIT THESE ===== */
+const CONFIG = {
+  whatsapp: "971500000000",           // company WhatsApp number, digits only with country code
+  rateNoMat: 25, rateMat: 30,          // AED per hour per cleaner
+  minHours: 2, maxHours: 10, maxLadies: 4,
+  openHour: 8, lastStart: 17,          // first and last start time (24h)
+  daysAhead: 14,
+  areas: ["Ajman","Sharjah","Dubai","Umm Al Quwain","Other (tell us in notes)"]
+};
+const SERVICES = [
+  {id:"regular", name:"Regular home cleaning", short:"Weekly upkeep", hours:3, desc:"Dusting, mopping, kitchen, bathrooms, beds made. The everyday reset.", icon:'<path d="M3 11l9-7 9 7v9H3z"/><path d="M9 20v-6h6v6"/>'},
+  {id:"deep", name:"Deep cleaning", short:"Top to bottom", hours:5, desc:"Inside cupboards, behind appliances, grout, windows and every corner.", icon:'<path d="M12 2l2.6 6.4L21 11l-6.4 2.6L12 20l-2.6-6.4L3 11l6.4-2.6Z"/>'},
+  {id:"move", name:"Move-in / move-out", short:"Empty homes", hours:6, desc:"Get your deposit back or start fresh in a clean new place.", icon:'<path d="M3 7h13v10H3zM16 10h3l2 3v4h-5"/><circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/>'},
+  {id:"office", name:"Office cleaning", short:"Shops & offices", hours:3, desc:"Desks, floors, pantry and washrooms, before or after working hours.", icon:'<rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2"/>'}
+];
+/* ====================== */
+
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const st = {svc:"regular", ladies:1, hours:3, mat:0, freq:"One-time", date:null, time:null, step:1};
+const DAYS=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"], MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+$("#yr").textContent = new Date().getFullYear();
+const prettyNum = "+" + CONFIG.whatsapp.replace(/^(\d{3})(\d{2})(\d{3})(\d+)$/,"$1 $2 $3 $4");
+$$(".waNumText").forEach(e=>e.textContent=prettyNum);
+$$(".waLink").forEach(a=>a.href=`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent("Hi Fast Shine! I'd like to book a cleaning.")}`);
+$$(".minH").forEach(e=>e.textContent=CONFIG.minHours);
+CONFIG.areas.forEach(a=>$("#area").insertAdjacentHTML("beforeend",`<option>${a}</option>`));
+
+const rate = () => st.mat ? CONFIG.rateMat : CONFIG.rateNoMat;
+const total = () => st.ladies * st.hours * rate();
+const svcObj = () => SERVICES.find(s=>s.id===st.svc);
+const fmtTime = h => { const ap=h<12?"AM":"PM"; const hh=h%12||12; return `${hh}:00 ${ap}`; };
+const fmtDate = d => `${DAYS[d.getDay()]}, ${d.getDate()} ${MON[d.getMonth()]}`;
+
+/* services */
+function renderSvcOpts(){
+  $("#svcOpts").innerHTML = SERVICES.map(s=>`<button type="button" class="opt ${s.id===st.svc?"sel":""}" data-svc="${s.id}"><b>${s.name.replace(" home","")}</b><small>${s.short}</small></button>`).join("");
+}
+$("#svcOpts").addEventListener("click",e=>{
+  const b=e.target.closest(".opt"); if(!b) return;
+  st.svc=b.dataset.svc; st.hours=Math.max(st.hours, svcObj().hours); renderSvcOpts(); update();
+});
+$("#svcCards").innerHTML = SERVICES.map(s=>`<div class="svc"><div class="ico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0E8C8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${s.icon}</svg></div><h3>${s.name}</h3><p>${s.desc}</p><div class="meta">Typically ${s.hours}+ hrs · from AED ${s.hours*CONFIG.rateNoMat}</div><a class="btn btn-primary" href="#book" data-pick="${s.id}">Book this</a></div>`).join("");
+document.addEventListener("click",e=>{
+  const p=e.target.closest("[data-pick]"); if(p){ st.svc=p.dataset.pick; st.hours=svcObj().hours; goStep(1); renderSvcOpts(); update(); }
+  const m=e.target.closest("[data-mat]"); if(m){ st.mat=+m.dataset.mat; syncToggle("#matToggle",String(st.mat)); goStep(1); update(); }
+});
+
+/* steppers & toggles */
+$$(".stepper button").forEach(b=>b.addEventListener("click",()=>{
+  const k=b.dataset.k, d=+b.dataset.d;
+  if(k==="ladies") st.ladies=Math.min(CONFIG.maxLadies,Math.max(1,st.ladies+d));
+  else st.hours=Math.min(CONFIG.maxHours,Math.max(CONFIG.minHours,st.hours+d));
+  update(); renderTimes();
+}));
+function syncToggle(sel,v){ $$(sel+" button").forEach(b=>b.classList.toggle("sel",b.dataset.v===v)); }
+$("#matToggle").addEventListener("click",e=>{const b=e.target.closest("button"); if(!b)return; st.mat=+b.dataset.v; syncToggle("#matToggle",b.dataset.v); update();});
+$("#freqToggle").addEventListener("click",e=>{const b=e.target.closest("button"); if(!b)return; st.freq=b.dataset.v; syncToggle("#freqToggle",b.dataset.v); update();});
+
+/* dates & times */
+function renderDates(){
+  const now=new Date(); let html="";
+  for(let i=0;i<CONFIG.daysAhead;i++){
+    const d=new Date(now.getFullYear(),now.getMonth(),now.getDate()+i);
+    if(i===0 && now.getHours()>=CONFIG.lastStart-1) continue; // too late for today
+    const key=d.toDateString();
+    html+=`<button type="button" class="date ${st.date===key?"sel":""}" data-d="${key}"><small>${i===0?"Today":i===1?"Tmrw":DAYS[d.getDay()]}</small><b>${d.getDate()}</b><em>${MON[d.getMonth()]}</em></button>`;
+  }
+  $("#dates").innerHTML=html;
+}
+function renderTimes(){
+  const now=new Date(), isToday = st.date===now.toDateString();
+  let html="";
+  for(let h=CONFIG.openHour; h<=CONFIG.lastStart; h++){
+    const past = isToday && h <= now.getHours()+1;
+    if(past && st.time===h) st.time=null;
+    html+=`<button type="button" class="time ${st.time===h?"sel":""}" data-h="${h}" ${past?"disabled":""}>${fmtTime(h).replace(":00","")}</button>`;
+  }
+  $("#times").innerHTML=html;
+}
+$("#dates").addEventListener("click",e=>{const b=e.target.closest(".date"); if(!b)return; st.date=b.dataset.d; renderDates(); renderTimes(); $("#timeErr").style.display="none"; update();});
+$("#times").addEventListener("click",e=>{const b=e.target.closest(".time"); if(!b)return; st.time=+b.dataset.h; renderTimes(); $("#timeErr").style.display="none"; update();});
+
+/* totals */
+function update(){
+  $("#ladiesOut").textContent=st.ladies; $("#hoursOut").textContent=st.hours;
+  $("#total").textContent=total();
+  $("#totalBreak").textContent=`${st.ladies} cleaner${st.ladies>1?"s":""} × ${st.hours} hrs × AED ${rate()}`;
+}
+
+/* steps */
+const TITLES={1:["Build your clean","Step 1 of 3"],2:["Pick your slot","Step 2 of 3"],3:["Where should we come?","Step 3 of 3"],4:["Almost done!","Review & send"]};
+const NEXT={1:"Choose time →",2:"Your details →",3:"Review booking →"};
+function goStep(n){
+  st.step=n;
+  $$(".step").forEach(s=>s.classList.toggle("active",+s.dataset.step===n));
+  $$(".steps i").forEach((i,ix)=>i.classList.toggle("on",ix<Math.min(n,3)));
+  $("#stepTitle").textContent=TITLES[n][0]; $("#stepSub").textContent=TITLES[n][1];
+  $("#backBtn").style.display = n>1 && n<4 ? "" : "none";
+  $("#nextBtn").style.display = n<4 ? "" : "none";
+  $("#bookFoot").style.display = n<4 ? "" : "none";
+  if(n<4) $("#nextBtn").textContent=NEXT[n];
+  if(n===2){ renderDates(); renderTimes(); }
+  if(n===4) buildSummary();
+}
+function validPhone(v){ const d=v.replace(/\D/g,""); return /^(05\d{8}|5\d{8}|9715\d{8}|009715\d{8})$/.test(d); }
+function validate3(){
+  let ok=true;
+  const chk=(id,cond)=>{ $("#f-"+id).classList.toggle("invalid",!cond); if(!cond) ok=false; };
+  chk("name", $("#name").value.trim().length>1);
+  chk("phone", validPhone($("#phone").value));
+  chk("area", !!$("#area").value);
+  chk("addr", $("#addr").value.trim().length>3);
+  return ok;
+}
+["name","phone","area","addr"].forEach(id=>$("#"+id).addEventListener("input",()=>$("#f-"+id).classList.remove("invalid")));
+$("#nextBtn").addEventListener("click",()=>{
+  if(st.step===2 && (!st.date || st.time===null)){ $("#timeErr").style.display="block"; return; }
+  if(st.step===3 && !validate3()) return;
+  goStep(st.step+1);
+  if(window.innerWidth<980) $("#book").scrollIntoView({behavior:"smooth"});
+});
+$("#backBtn").addEventListener("click",()=>goStep(st.step-1));
+$("#editBtn").addEventListener("click",()=>goStep(1));
+
+function bookingText(){
+  const d=new Date(st.date);
+  return [
+    "*New booking — Fast Shine*",
+    "",
+    `Service: ${svcObj().name}`,
+    `Cleaners: ${st.ladies}`,
+    `Hours: ${st.hours}`,
+    `Materials: ${st.mat?"Yes, bring materials":"No, I have my own"}`,
+    `Frequency: ${st.freq}`,
+    `Date: ${fmtDate(d)}`,
+    `Start time: ${fmtTime(st.time)}`,
+    "",
+    `Name: ${$("#name").value.trim()}`,
+    `Phone: ${$("#phone").value.trim()}`,
+    `Area: ${$("#area").value}`,
+    `Address: ${$("#addr").value.trim()}`,
+    $("#notes").value.trim() ? `Notes: ${$("#notes").value.trim()}` : null,
+    "",
+    `Estimated total: AED ${total()} (${st.ladies} × ${st.hours} hrs × AED ${rate()})`
+  ].filter(l=>l!==null).join("\n");
+}
+function buildSummary(){
+  const d=new Date(st.date);
+  const rows=[["Service",svcObj().name],["Team",`${st.ladies} cleaner${st.ladies>1?"s":""} · ${st.hours} hrs`],["Materials",st.mat?"We bring them":"Your own"],["When",`${fmtDate(d)} · ${fmtTime(st.time)}`],["Frequency",st.freq],["Where",`${$("#addr").value.trim()}, ${$("#area").value}`],["Total",`AED ${total()}`]];
+  $("#summary").innerHTML=rows.map(r=>`<div><span>${r[0]}</span><span>${r[1].replace(/</g,"&lt;")}</span></div>`).join("");
+  $("#waSend").href=`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(bookingText())}`;
+}
+$("#copyBtn").addEventListener("click",async()=>{
+  try{ await navigator.clipboard.writeText(bookingText()); $("#copyBtn").textContent="Copied ✓"; }
+  catch(e){ $("#copyBtn").textContent="Couldn't copy"; }
+  setTimeout(()=>$("#copyBtn").textContent="Copy details",1800);
+});
+
+renderSvcOpts(); update();
+</script>
+</body>
+</html>
