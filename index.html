@@ -102,6 +102,7 @@ a.ptag.sel em{color:#9A6A00}
 .time{border:1.5px solid var(--line);border-radius:10px;padding:9px 0;font-weight:700;font-size:.86rem;background:#fff}
 .time.sel{border-color:var(--teal);background:var(--teal);color:#fff}
 .time[disabled]{opacity:.35;text-decoration:line-through;pointer-events:none}
+.date[disabled]{opacity:.4;pointer-events:none;background:var(--bg)}
 input,select,textarea{width:100%;font:inherit;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff;color:var(--ink);outline:none;transition:border .15s}
 input:focus,select:focus,textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(14,140,140,.12)}
 textarea{resize:vertical;min-height:64px}
@@ -444,7 +445,11 @@ const CONFIG = {
   rates: {"Ajman":25, "Umm Al Quwain":28, "Sharjah":30}, // AED per hour per cleaner, by emirate
   materialsFee: 5,                     // extra AED per hour per cleaner when we bring materials
   minHours: 2, maxHours: 10, maxLadies: 4,
-  openHour: 8, lastStart: 17,          // first and last start time (24h)
+  openHour: 8, closeHour: 20,          // working hours (24h): jobs start from 8 AM and must finish by 8 PM
+  totalCleaners: 6,                    // cleaners available on a normal day
+  travelBuffer: 1,                     // hours kept free between jobs for travel
+  sheetId: "",                         // Google Sheet ID with confirmed bookings (see README). Empty = all slots open
+  sheetTab: "Bookings",
   daysAhead: 14,
 };
 const SERVICES = [
@@ -502,32 +507,91 @@ $$(".stepper button").forEach(b=>b.addEventListener("click",()=>{
   const k=b.dataset.k, d=+b.dataset.d;
   if(k==="ladies") st.ladies=Math.min(CONFIG.maxLadies,Math.max(1,st.ladies+d));
   else st.hours=Math.min(CONFIG.maxHours,Math.max(CONFIG.minHours,st.hours+d));
-  update(); renderTimes();
+  update(); if(st.step===2){ renderDates(); renderTimes(); }
 }));
 function syncToggle(sel,v){ $$(sel+" button").forEach(b=>b.classList.toggle("sel",b.dataset.v===v)); }
 $("#matToggle").addEventListener("click",e=>{const b=e.target.closest("button"); if(!b)return; st.mat=+b.dataset.v; syncToggle("#matToggle",b.dataset.v); update();});
 $("#freqToggle").addEventListener("click",e=>{const b=e.target.closest("button"); if(!b)return; st.freq=b.dataset.v; syncToggle("#freqToggle",b.dataset.v); update();});
 
+/* ---------- availability from Google Sheet ---------- */
+let BOOKED = [];          // {date:"YYYY-MM-DD", start:Number, end:Number, cleaners:Number}
+const pad = n => String(n).padStart(2,"0");
+const keyOf = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const dateOf = k => { const [y,m,d]=k.split("-").map(Number); return new Date(y,m-1,d); };
+function cellDate(c){
+  if(!c || c.v==null) return null;
+  let m = String(c.v).match(/^Date\((\d+),(\d+),(\d+)/);
+  if(m) return `${m[1]}-${pad(+m[2]+1)}-${pad(m[3])}`;
+  const t = String(c.f||c.v).trim();
+  if((m=t.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/))) return `${m[1]}-${pad(m[2])}-${pad(m[3])}`;
+  if((m=t.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})/))) return `${m[3]}-${pad(m[2])}-${pad(m[1])}`; // dd/mm/yyyy
+  return null;
+}
+function cellHour(c){
+  if(!c || c.v==null) return null;
+  if(Array.isArray(c.v)) return c.v[0] + (c.v[1]||0)/60;            // time of day
+  if(typeof c.v==="number") return c.v<1 ? c.v*24 : c.v;            // 10 or 0.4166
+  const m = String(c.f||c.v).trim().toLowerCase().match(/^(\d{1,2})(?:[:.](\d{2}))?\s*(am|pm)?/);
+  if(!m) return null;
+  let h=+m[1]+(m[2]?+m[2]/60:0);
+  if(m[3]==="pm" && h<12) h+=12; if(m[3]==="am" && h>=12) h-=12;
+  return h;
+}
+function cellNum(c, dflt){
+  if(!c || c.v==null || c.v==="") return dflt;
+  if(String(c.v).trim().toLowerCase()==="all") return CONFIG.totalCleaners;
+  const n=parseFloat(c.v); return isNaN(n)?dflt:n;
+}
+async function loadBookings(){
+  if(!CONFIG.sheetId) return;
+  try{
+    const url=`https://docs.google.com/spreadsheets/d/${CONFIG.sheetId}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(CONFIG.sheetTab)}&_=${Date.now()}`;
+    const txt=await (await fetch(url)).text();
+    const json=JSON.parse(txt.slice(txt.indexOf("{"), txt.lastIndexOf("}")+1));
+    BOOKED = (json.table.rows||[]).map(r=>{
+      const c=r.c||[], date=cellDate(c[0]), start=cellHour(c[1]);
+      const hours=cellNum(c[2], CONFIG.closeHour-(start??CONFIG.openHour)), cleaners=cellNum(c[3], CONFIG.totalCleaners);
+      if(!date) return null;
+      const st0 = start ?? CONFIG.openHour;
+      return {date, start:st0, end:st0+hours, cleaners};
+    }).filter(Boolean);
+    if(st.step===2){ renderDates(); renderTimes(); }
+  }catch(e){ console.warn("Availability sheet not loaded; showing all slots.", e); }
+}
+// cleaners already busy during hour-cell [t, t+1) on a date (travel buffer applied around existing jobs)
+function busyAt(date,t){
+  const b=CONFIG.travelBuffer;
+  return BOOKED.reduce((sum,x)=> x.date===date && t < x.end+b && t+1 > x.start-b ? sum+x.cleaners : sum, 0);
+}
+function slotOpen(date,h){
+  if(h + st.hours > CONFIG.closeHour) return false;
+  const now=new Date();
+  if(date===keyOf(now) && h <= now.getHours()+1) return false;
+  for(let t=h; t<h+st.hours; t++) if(CONFIG.totalCleaners - busyAt(date,t) < st.ladies) return false;
+  return true;
+}
+const startHours = () => { const a=[]; for(let h=CONFIG.openHour; h+CONFIG.minHours<=CONFIG.closeHour; h++) a.push(h); return a; };
+const dayOpen = date => startHours().some(h=>slotOpen(date,h));
+
 /* dates & times */
 function renderDates(){
   const now=new Date(); let html="";
   for(let i=0;i<CONFIG.daysAhead;i++){
-    const d=new Date(now.getFullYear(),now.getMonth(),now.getDate()+i);
-    if(i===0 && now.getHours()>=CONFIG.lastStart-1) continue; // too late for today
-    const key=d.toDateString();
-    html+=`<button type="button" class="date ${st.date===key?"sel":""}" data-d="${key}"><small>${i===0?"Today":i===1?"Tmrw":DAYS[d.getDay()]}</small><b>${d.getDate()}</b><em>${MON[d.getMonth()]}</em></button>`;
+    const d=new Date(now.getFullYear(),now.getMonth(),now.getDate()+i), key=keyOf(d), open=dayOpen(key);
+    if(!open && st.date===key){ st.date=null; st.time=null; }
+    html+=`<button type="button" class="date ${st.date===key?"sel":""}" data-d="${key}" ${open?"":"disabled"}><small>${i===0?"Today":i===1?"Tmrw":DAYS[d.getDay()]}</small><b>${d.getDate()}</b><em>${open?MON[d.getMonth()]:"Full"}</em></button>`;
   }
   $("#dates").innerHTML=html;
 }
 function renderTimes(){
-  const now=new Date(), isToday = st.date===now.toDateString();
-  let html="";
-  for(let h=CONFIG.openHour; h<=CONFIG.lastStart; h++){
-    const past = isToday && h <= now.getHours()+1;
-    if(past && st.time===h) st.time=null;
-    html+=`<button type="button" class="time ${st.time===h?"sel":""}" data-h="${h}" ${past?"disabled":""}>${fmtTime(h).replace(":00","")}</button>`;
+  if(!st.date){ $("#times").innerHTML=`<p style="grid-column:1/-1;color:var(--muted);font-size:.86rem">Choose a day to see open times.</p>`; return; }
+  let html="", any=false;
+  for(const h of startHours()){
+    const open=slotOpen(st.date,h); any=any||open;
+    if(!open && st.time===h) st.time=null;
+    html+=`<button type="button" class="time ${st.time===h?"sel":""}" data-h="${h}" ${open?"":"disabled"}>${fmtTime(h).replace(":00","")}</button>`;
   }
-  $("#times").innerHTML=html;
+  $("#times").innerHTML = any ? html : `<p style="grid-column:1/-1;color:var(--muted);font-size:.86rem">No times left for ${st.ladies} cleaner(s) × ${st.hours} hrs that day. Try fewer hours or another day.</p>`;
 }
 $("#dates").addEventListener("click",e=>{const b=e.target.closest(".date"); if(!b)return; st.date=b.dataset.d; renderDates(); renderTimes(); $("#timeErr").style.display="none"; update();});
 $("#times").addEventListener("click",e=>{const b=e.target.closest(".time"); if(!b)return; st.time=+b.dataset.h; renderTimes(); $("#timeErr").style.display="none"; update();});
@@ -576,7 +640,7 @@ $("#backBtn").addEventListener("click",()=>goStep(st.step-1));
 $("#editBtn").addEventListener("click",()=>goStep(1));
 
 function bookingText(){
-  const d=new Date(st.date);
+  const d=dateOf(st.date);
   return [
     "*New booking — Fast Shine*",
     "",
@@ -598,7 +662,7 @@ function bookingText(){
   ].filter(l=>l!==null).join("\n");
 }
 function buildSummary(){
-  const d=new Date(st.date);
+  const d=dateOf(st.date);
   const rows=[["Service",svcObj().name],["Team",`${st.ladies} cleaner${st.ladies>1?"s":""} · ${st.hours} hrs`],["Materials",st.mat?"We bring them":"Your own"],["When",`${fmtDate(d)} · ${fmtTime(st.time)}`],["Frequency",st.freq],["Where",`${$("#addr").value.trim()}, ${st.area}`],["Total",`AED ${total()}`]];
   $("#summary").innerHTML=rows.map(r=>`<div><span>${r[0]}</span><span>${r[1].replace(/</g,"&lt;")}</span></div>`).join("");
   $("#waSend").href=`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(bookingText())}`;
@@ -609,7 +673,7 @@ $("#copyBtn").addEventListener("click",async()=>{
   setTimeout(()=>$("#copyBtn").textContent="Copy details",1800);
 });
 
-renderAreaOpts(); renderSvcOpts(); update();
+renderAreaOpts(); renderSvcOpts(); update(); loadBookings();
 </script>
 </body>
 </html>
