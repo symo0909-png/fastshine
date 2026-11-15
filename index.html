@@ -335,7 +335,7 @@ footer{padding:40px 0 110px;color:var(--muted);font-size:.88rem}
             <div class="field" id="f-phone"><label class="lbl">Mobile number</label><input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="05X XXX XXXX"><div class="err">Enter a valid UAE mobile.</div></div>
           </div>
           <div class="field" id="f-addr"><label class="lbl">Address in <span id="areaLbl" style="color:var(--teal-d);font-weight:800"></span></label><input id="addr" autocomplete="street-address" placeholder="Area, building / villa & flat no."><div class="err">Please add your address.</div></div>
-          <div class="field"><label class="lbl">Preferred cleaner <span>(optional)</span></label>
+          <div class="field"><label class="lbl">Preferred cleaner <span id="clHint">(optional)</span></label>
             <div class="cleaners" id="cleanerOpts"></div>
           </div>
           <div class="field"><label class="lbl">Anything we should know? <span>(optional)</span></label><textarea id="notes" placeholder="Pets, focus areas, parking, access code…"></textarea></div>
@@ -501,7 +501,7 @@ const SERVICES = [
 /* ====================== */
 
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
-const st = {cleaner:"No preference", area:"Ajman", svc:"regular", ladies:1, hours:3, mat:0, freq:"One-time", date:null, time:null, step:1};
+const st = {cleaners:[], area:"Ajman", svc:"regular", ladies:1, hours:3, mat:0, freq:"One-time", date:null, time:null, step:1};
 const DAYS=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"], MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 $("#yr").textContent = new Date().getFullYear();
@@ -519,10 +519,19 @@ const ex = CONFIG.rates[AREAS[0]]+CONFIG.materialsFee;
 $("#example").innerHTML = `Example: 2 cleaners × 4 hours in ${AREAS[0]} with materials = <b>AED ${2*4*ex}</b>`;
 $("#teamGrid").innerHTML = CONFIG.cleaners.map(c=>`<a class="member" href="#book" data-cleaner="${c.name}"><img src="${c.photo}" alt="${c.name}, Fast Shine cleaner" loading="lazy"><b>${c.name}</b><small>Book ${c.name} →</small></a>`).join("");
 function renderCleaners(){
-  const any=`<button type="button" class="cl ${st.cleaner==="No preference"?"sel":""}" data-c="No preference"><span class="any">✦</span>Anyone</button>`;
-  $("#cleanerOpts").innerHTML = any + CONFIG.cleaners.map(c=>`<button type="button" class="cl ${c.name===st.cleaner?"sel":""}" data-c="${c.name}"><img src="${c.photo}" alt="">${c.name}</button>`).join("");
+  if(st.cleaners.length>st.ladies) st.cleaners=st.cleaners.slice(-st.ladies);
+  $("#clHint").textContent = st.ladies>1 ? `(optional, pick up to ${st.ladies})` : "(optional)";
+  const any=`<button type="button" class="cl ${st.cleaners.length?"":"sel"}" data-c=""><span class="any">✦</span>Anyone</button>`;
+  $("#cleanerOpts").innerHTML = any + CONFIG.cleaners.map(c=>`<button type="button" class="cl ${st.cleaners.includes(c.name)?"sel":""}" data-c="${c.name}"><img src="${c.photo}" alt="">${c.name}</button>`).join("");
 }
-$("#cleanerOpts").addEventListener("click",e=>{const b=e.target.closest(".cl"); if(!b)return; st.cleaner=b.dataset.c; renderCleaners();});
+function pickCleaner(n){
+  if(!n){ st.cleaners=[]; }
+  else if(st.cleaners.includes(n)) st.cleaners=st.cleaners.filter(x=>x!==n);
+  else { st.cleaners.push(n); if(st.cleaners.length>st.ladies) st.cleaners.shift(); }
+  renderCleaners();
+}
+const cleanerText = () => !st.cleaners.length ? "No preference" : st.cleaners.join(", ") + (st.cleaners.length<st.ladies ? " + any available" : "");
+$("#cleanerOpts").addEventListener("click",e=>{const b=e.target.closest(".cl"); if(!b)return; pickCleaner(b.dataset.c);});
 function renderAreaOpts(){
   $("#areaOpts").innerHTML = AREAS.map(a=>`<button type="button" class="opt ${a===st.area?"sel":""}" data-a="${a}"><b>${a}</b><small>AED ${CONFIG.rates[a]}/hr</small></button>`).join("");
 }
@@ -545,7 +554,7 @@ $("#svcOpts").addEventListener("click",e=>{
 $("#svcCards").innerHTML = SERVICES.map(s=>`<div class="svc"><div class="ico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0E8C8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${s.icon}</svg></div><h3>${s.name}</h3><p>${s.desc}</p><div class="meta">Typically ${s.hours}+ hrs · from AED ${s.hours*MINRATE}</div><a class="btn btn-primary" href="#book" data-pick="${s.id}">Book this</a></div>`).join("");
 document.addEventListener("click",e=>{
   const p=e.target.closest("[data-pick]"); if(p){ st.svc=p.dataset.pick; st.hours=svcObj().hours; goStep(1); renderSvcOpts(); update(); }
-  const cm=e.target.closest("[data-cleaner]"); if(cm){ st.cleaner=cm.dataset.cleaner; renderCleaners(); goStep(1); }
+  const cm=e.target.closest("[data-cleaner]"); if(cm){ if(!st.cleaners.includes(cm.dataset.cleaner)) pickCleaner(cm.dataset.cleaner); goStep(1); }
   const ar=e.target.closest("[data-area]"); if(ar){ st.area=ar.dataset.area; renderAreaOpts(); goStep(1); update(); }
 });
 
@@ -554,7 +563,7 @@ $$(".stepper button").forEach(b=>b.addEventListener("click",()=>{
   const k=b.dataset.k, d=+b.dataset.d;
   if(k==="ladies") st.ladies=Math.min(CONFIG.maxLadies,Math.max(1,st.ladies+d));
   else st.hours=Math.min(CONFIG.maxHours,Math.max(CONFIG.minHours,st.hours+d));
-  update(); if(st.step===2){ renderDates(); renderTimes(); }
+  update(); renderCleaners(); if(st.step===2){ renderDates(); renderTimes(); }
 }));
 function syncToggle(sel,v){ $$(sel+" button").forEach(b=>b.classList.toggle("sel",b.dataset.v===v)); }
 $("#matToggle").addEventListener("click",e=>{const b=e.target.closest("button"); if(!b)return; st.mat=+b.dataset.v; syncToggle("#matToggle",b.dataset.v); update();});
@@ -696,7 +705,7 @@ function bookingText(){
     `Hours: ${st.hours}`,
     `Materials: ${st.mat?"Yes, bring materials":"No, I have my own"}`,
     `Frequency: ${st.freq}`,
-    `Preferred cleaner: ${st.cleaner}`,
+    `Preferred cleaner${st.cleaners.length>1?"s":""}: ${cleanerText()}`,
     `Date: ${fmtDate(d)}`,
     `Start time: ${fmtTime(st.time)}`,
     "",
@@ -711,7 +720,7 @@ function bookingText(){
 }
 function buildSummary(){
   const d=dateOf(st.date);
-  const rows=[["Service",svcObj().name],["Team",`${st.ladies} cleaner${st.ladies>1?"s":""} · ${st.hours} hrs`],["Materials",st.mat?"We bring them":"Your own"],["When",`${fmtDate(d)} · ${fmtTime(st.time)}`],["Frequency",st.freq],["Cleaner",st.cleaner],["Where",`${$("#addr").value.trim()}, ${st.area}`],["Total",`AED ${total()}`]];
+  const rows=[["Service",svcObj().name],["Team",`${st.ladies} cleaner${st.ladies>1?"s":""} · ${st.hours} hrs`],["Materials",st.mat?"We bring them":"Your own"],["When",`${fmtDate(d)} · ${fmtTime(st.time)}`],["Frequency",st.freq],["Cleaner",cleanerText()],["Where",`${$("#addr").value.trim()}, ${st.area}`],["Total",`AED ${total()}`]];
   $("#summary").innerHTML=rows.map(r=>`<div><span>${r[0]}</span><span>${r[1].replace(/</g,"&lt;")}</span></div>`).join("");
   $("#waSend").href=`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(bookingText())}`;
 }
