@@ -176,13 +176,22 @@ footer{padding:40px 0 110px;color:var(--muted);font-size:.88rem}
 .foot{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:28px}
 
 /* team */
-.team{display:grid;grid-template-columns:.85fr 1fr;gap:56px;align-items:center}
-.team img{width:100%;max-height:560px;object-fit:cover;object-position:center 30%;border-radius:24px;box-shadow:0 24px 60px rgba(8,96,95,.18)}
-.names{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
-.names span{background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-weight:700;font-size:.88rem;color:var(--teal-d)}
-.cleaners{display:flex;flex-wrap:wrap;gap:8px}
-.cleaners .opt{padding:9px 14px;border-radius:999px;font-weight:700;font-size:.88rem}
-@media (max-width:980px){.team{grid-template-columns:1fr;gap:30px}.team img{max-height:440px}}
+.team{display:grid;grid-template-columns:repeat(6,1fr);gap:22px;margin-top:40px}
+.member{text-decoration:none;color:inherit;display:flex;flex-direction:column;align-items:center;gap:12px}
+.member img{width:100%;max-width:150px;aspect-ratio:1;border-radius:50%;object-fit:cover;border:4px solid #fff;box-shadow:0 0 0 2px var(--teal-l),0 14px 30px rgba(8,96,95,.16);transition:transform .2s, box-shadow .2s}
+.member:hover img{transform:translateY(-4px) scale(1.03);box-shadow:0 0 0 3px var(--gold),0 18px 36px rgba(8,96,95,.22)}
+.member b{font-size:1.02rem}
+.member small{font-size:.8rem;font-weight:700;color:var(--teal);opacity:0;transition:opacity .2s;margin-top:-8px}
+.member:hover small{opacity:1}
+.cleaners{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.cl{border:1.5px solid var(--line);border-radius:14px;padding:8px 4px;background:#fff;display:flex;flex-direction:column;align-items:center;gap:5px;font-weight:700;font-size:.8rem;transition:.15s}
+.cl img,.cl .any{width:46px;height:46px;border-radius:50%;object-fit:cover}
+.cl .any{background:var(--teal-l);display:grid;place-items:center;color:var(--teal);font-size:1.3rem}
+.cl:hover{border-color:var(--teal)}
+.cl.sel{border-color:var(--teal);background:var(--teal-l);box-shadow:inset 0 0 0 1px var(--teal)}
+.cl.sel img{box-shadow:0 0 0 2px var(--teal)}
+@media (max-width:980px){.team{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:640px){.team{gap:18px 12px}.member small{opacity:1}}
 
 /* floating */
 .wa-float{position:fixed;right:20px;bottom:22px;z-index:50;width:58px;height:58px;border-radius:50%;background:var(--wa);display:grid;place-items:center;box-shadow:0 10px 26px rgba(31,168,85,.4);text-decoration:none}
@@ -378,15 +387,11 @@ footer{padding:40px 0 110px;color:var(--muted);font-size:.88rem}
 
 <!-- TEAM -->
 <section style="padding-top:0">
-  <div class="wrap team">
-    <img src="team.jpg" alt="The Fast Shine cleaning team in their pink uniforms" loading="lazy">
-    <div>
-      <span class="eyebrow">Meet the team</span>
-      <h2 class="t">The ladies behind the shine.</h2>
-      <p class="sub">Friendly, experienced and proud of their work. Found a favourite? Ask for her by name when you book, and we'll send her whenever she's free.</p>
-      <div class="names" id="teamNames"></div>
-      <a class="btn btn-primary" href="#book" style="margin-top:22px">Book your cleaner</a>
-    </div>
+  <div class="wrap center">
+    <span class="eyebrow">Meet the team</span>
+    <h2 class="t">The ladies behind the shine.</h2>
+    <p class="sub">Friendly, experienced and proud of their work. Found a favourite? Tap her photo to book her, and we'll send her whenever she's free.</p>
+    <div class="team" id="teamGrid"></div>
   </div>
 </section>
 
@@ -477,7 +482,14 @@ const CONFIG = {
   travelBuffer: 1,                     // hours kept free between jobs for travel
   sheetId: "1ipKreB-i88R0URS2jZnAi2JlKIHu1bil6KTMYXw7fUc",                         // Google Sheet ID with confirmed bookings (see README). Empty = all slots open
   sheetTab: "Bookings",
-  cleaners: ["Rose","Sherlyn","Judy","Charlotte","Angie","Anna"],   // shown in "Preferred cleaner"
+  cleaners: [                          // shown in "Meet the team" and "Preferred cleaner"
+    {name:"Rose", photo:"cleaners/rose.jpg"},
+    {name:"Sherlyn", photo:"cleaners/sherlyn.jpg"},
+    {name:"Judy", photo:"cleaners/judy.jpg"},
+    {name:"Charlotte", photo:"cleaners/charlotte.jpg"},
+    {name:"Angie", photo:"cleaners/angie.jpg"},
+    {name:"Anna", photo:"cleaners/anna.jpg"}
+  ],
   daysAhead: 14,
 };
 const SERVICES = [
@@ -505,11 +517,12 @@ $("#heroTags").innerHTML = AREAS.map(a=>`<a class="ptag" href="#book" data-area=
 $("#rateCards").innerHTML = AREAS.map((a,i)=>`<div class="rate ${i===0?"hl":""}">${i===0?'<span class="badge">Best rate</span>':""}<h3>${a}</h3><div class="big">AED ${CONFIG.rates[a]}<span> / hr / cleaner</span></div><ul><li>All services available</li><li>+AED ${CONFIG.materialsFee}/hr if we bring materials</li><li>Minimum ${CONFIG.minHours} hours</li></ul><a class="btn ${i===0?"btn-primary":"btn-ghost"}" href="#book" data-area="${a}">Book in ${a}</a></div>`).join("");
 const ex = CONFIG.rates[AREAS[0]]+CONFIG.materialsFee;
 $("#example").innerHTML = `Example: 2 cleaners × 4 hours in ${AREAS[0]} with materials = <b>AED ${2*4*ex}</b>`;
-$("#teamNames").innerHTML = CONFIG.cleaners.map(n=>`<span>${n}</span>`).join("");
+$("#teamGrid").innerHTML = CONFIG.cleaners.map(c=>`<a class="member" href="#book" data-cleaner="${c.name}"><img src="${c.photo}" alt="${c.name}, Fast Shine cleaner" loading="lazy"><b>${c.name}</b><small>Book ${c.name} →</small></a>`).join("");
 function renderCleaners(){
-  $("#cleanerOpts").innerHTML = ["No preference",...CONFIG.cleaners].map(n=>`<button type="button" class="opt ${n===st.cleaner?"sel":""}" data-c="${n}">${n}</button>`).join("");
+  const any=`<button type="button" class="cl ${st.cleaner==="No preference"?"sel":""}" data-c="No preference"><span class="any">✦</span>Anyone</button>`;
+  $("#cleanerOpts").innerHTML = any + CONFIG.cleaners.map(c=>`<button type="button" class="cl ${c.name===st.cleaner?"sel":""}" data-c="${c.name}"><img src="${c.photo}" alt="">${c.name}</button>`).join("");
 }
-$("#cleanerOpts").addEventListener("click",e=>{const b=e.target.closest(".opt"); if(!b)return; st.cleaner=b.dataset.c; renderCleaners();});
+$("#cleanerOpts").addEventListener("click",e=>{const b=e.target.closest(".cl"); if(!b)return; st.cleaner=b.dataset.c; renderCleaners();});
 function renderAreaOpts(){
   $("#areaOpts").innerHTML = AREAS.map(a=>`<button type="button" class="opt ${a===st.area?"sel":""}" data-a="${a}"><b>${a}</b><small>AED ${CONFIG.rates[a]}/hr</small></button>`).join("");
 }
@@ -532,6 +545,7 @@ $("#svcOpts").addEventListener("click",e=>{
 $("#svcCards").innerHTML = SERVICES.map(s=>`<div class="svc"><div class="ico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0E8C8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${s.icon}</svg></div><h3>${s.name}</h3><p>${s.desc}</p><div class="meta">Typically ${s.hours}+ hrs · from AED ${s.hours*MINRATE}</div><a class="btn btn-primary" href="#book" data-pick="${s.id}">Book this</a></div>`).join("");
 document.addEventListener("click",e=>{
   const p=e.target.closest("[data-pick]"); if(p){ st.svc=p.dataset.pick; st.hours=svcObj().hours; goStep(1); renderSvcOpts(); update(); }
+  const cm=e.target.closest("[data-cleaner]"); if(cm){ st.cleaner=cm.dataset.cleaner; renderCleaners(); goStep(1); }
   const ar=e.target.closest("[data-area]"); if(ar){ st.area=ar.dataset.area; renderAreaOpts(); goStep(1); update(); }
 });
 
